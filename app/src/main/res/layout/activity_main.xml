@@ -5,38 +5,50 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:padding="20dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Chat Floating Helper"
-        android:textSize="26sp"
+        android:textSize="25sp"
         android:textStyle="bold"
         android:gravity="center"
-        android:layout_marginBottom="25dp" />
+        android:layout_marginBottom="20dp"/>
 
     <EditText
         android:id="@+id/messageInput"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Apna custom message likho"
-        android:minLines="3"
+        android:layout_height="120dp"
         android:gravity="top"
-        android:inputType="textMultiLine" />
+        android:hint="Yahan custom message likho"
+        android:inputType="textMultiLine"/>
+
+    <Button
+        android:id="@+id/addMessageButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ADD MESSAGE"/>
+
+    <TextView
+        android:id="@+id/messageList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="Messages yahan dikhenge"
+        android:textSize="16sp"
+        android:padding="10dp"/>
 
     <Button
         android:id="@+id/startButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="START FLOATING HELPER"
-        android:layout_marginTop="20dp" />
+        android:text="START FLOATING HELPER"/>
 
     <Button
         android:id="@+id/stopButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="STOP FLOATING HELPER"
-        android:layout_marginTop="10dp" />
+        android:text="STOP FLOATING HELPER"/>
 
 </LinearLayout>
