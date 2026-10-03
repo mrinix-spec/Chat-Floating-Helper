@@ -1,6 +1,8 @@
 package com.chathelper
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -24,6 +26,52 @@ class MainActivity : AppCompatActivity() {
 
     private val messages = ArrayList<String>()
     private val client = OkHttpClient()
+
+    private val handler = Handler(Looper.getMainLooper())
+
+    private var autoRunning = false
+    private var currentIndex = 0
+
+    private val autoSendRunnable = object : Runnable {
+
+        override fun run() {
+
+            if (!autoRunning || messages.isEmpty()) {
+                return
+            }
+
+            val token =
+                botTokenInput.text.toString().trim()
+
+            val chatId =
+                chatIdInput.text.toString().trim()
+
+            if (token.isEmpty() || chatId.isEmpty()) {
+                autoRunning = false
+                statusText.text = "Status: Bot Token/Chat ID missing"
+                return
+            }
+
+            val message = messages[currentIndex]
+
+            sendTelegramMessage(
+                token,
+                chatId,
+                message
+            )
+
+            currentIndex++
+
+            if (currentIndex >= messages.size) {
+                currentIndex = 0
+            }
+
+            handler.postDelayed(
+                this,
+                5000
+            )
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -121,16 +169,46 @@ class MainActivity : AppCompatActivity() {
 
         startButton.setOnClickListener {
 
-            Toast.makeText(
-                this,
-                "Auto Bot setup next step me hoga",
-                Toast.LENGTH_SHORT
-            ).show()
+            val token =
+                botTokenInput.text.toString().trim()
+
+            val chatId =
+                chatIdInput.text.toString().trim()
+
+            if (token.isEmpty() || chatId.isEmpty()) {
+                Toast.makeText(
+                    this,
+                    "Bot Token aur Chat ID enter karo",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+
+            if (messages.isEmpty()) {
+                Toast.makeText(
+                    this,
+                    "Pehle message add karo",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+
+            if (autoRunning) {
+                return@setOnClickListener
+            }
+
+            autoRunning = true
+            currentIndex = 0
+
+            statusText.text =
+                "Status: Auto Bot ON"
+
+            handler.post(autoSendRunnable)
         }
 
         stopButton.setOnClickListener {
 
-            statusText.text = "Status: Stopped"
+            stopAutoBot()
         }
     }
 
@@ -139,8 +217,6 @@ class MainActivity : AppCompatActivity() {
         chatId: String,
         message: String
     ) {
-
-        statusText.text = "Status: Sending..."
 
         val encodedMessage =
             URLEncoder.encode(
@@ -170,7 +246,7 @@ class MainActivity : AppCompatActivity() {
                     runOnUiThread {
 
                         statusText.text =
-                            "Status: Failed - ${e.message}"
+                            "Status: Send failed"
                     }
                 }
 
@@ -189,7 +265,7 @@ class MainActivity : AppCompatActivity() {
                         if (success) {
 
                             statusText.text =
-                                "Status: Telegram message sent"
+                                "Status: Message sent"
 
                         } else {
 
@@ -200,6 +276,18 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         )
+    }
+
+    private fun stopAutoBot() {
+
+        autoRunning = false
+
+        handler.removeCallbacks(
+            autoSendRunnable
+        )
+
+        statusText.text =
+            "Status: Stopped"
     }
 
     private fun updateMessageList() {
@@ -271,6 +359,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+
+        stopAutoBot()
 
         client.dispatcher.cancelAll()
 
