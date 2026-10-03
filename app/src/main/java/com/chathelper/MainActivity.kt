@@ -1,66 +1,236 @@
-<?xml version="1.0" encoding="utf-8"?>
+package com.chathelper
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="My Test Chat"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginBottom="12dp"/>
+class MainActivity : AppCompatActivity() {
 
-    <EditText
-        android:id="@+id/messageInput"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:hint="Custom message likho"
-        android:gravity="top"
-        android:inputType="textMultiLine"/>
+    private val messages = ArrayList<String>()
 
-    <Button
-        android:id="@+id/addMessageButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="ADD MESSAGE"/>
+    private lateinit var messageInput: EditText
+    private lateinit var messageList: TextView
+    private lateinit var chatBox: TextView
 
-    <TextView
-        android:id="@+id/messageList"
-        android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:padding="8dp"
-        android:text="Saved messages..."
-        android:textSize="16sp"/>
+    private val handler = Handler(Looper.getMainLooper())
 
-    <Button
-        android:id="@+id/startButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="START AUTO CHAT"/>
+    private var currentIndex = 0
+    private var autoRunning = false
 
-    <Button
-        android:id="@+id/stopButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="STOP AUTO CHAT"/>
+    private val autoSendRunnable = object : Runnable {
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        override fun run() {
 
-        <TextView
-            android:id="@+id/chatBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="12dp"
-            android:textSize="17sp"/>
-    </ScrollView>
+            if (!autoRunning || messages.isEmpty()) {
+                return
+            }
 
-</LinearLayout>
+            sendNextMessage()
+
+            handler.postDelayed(
+                this,
+                5000
+            )
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setContentView(R.layout.activity_main)
+
+        messageInput = findViewById(R.id.messageInput)
+        messageList = findViewById(R.id.messageList)
+        chatBox = findViewById(R.id.chatBox)
+
+        val addButton =
+            findViewById<Button>(R.id.addMessageButton)
+
+        val startButton =
+            findViewById<Button>(R.id.startButton)
+
+        val stopButton =
+            findViewById<Button>(R.id.stopButton)
+
+        loadMessages()
+
+        addButton.setOnClickListener {
+
+            val message =
+                messageInput.text.toString().trim()
+
+            if (message.isEmpty()) {
+
+                Toast.makeText(
+                    this,
+                    "Pehle message likho",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                return@setOnClickListener
+            }
+
+            messages.add(message)
+
+            messageInput.text.clear()
+
+            saveMessages()
+            updateMessageList()
+
+            Toast.makeText(
+                this,
+                "Message saved",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        startButton.setOnClickListener {
+
+            if (messages.isEmpty()) {
+
+                Toast.makeText(
+                    this,
+                    "Pehle kam se kam 1 message add karo",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                return@setOnClickListener
+            }
+
+            if (autoRunning) {
+                return@setOnClickListener
+            }
+
+            autoRunning = true
+            currentIndex = 0
+
+            Toast.makeText(
+                this,
+                "Auto Chat Started",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            handler.post(autoSendRunnable)
+        }
+
+        stopButton.setOnClickListener {
+
+            stopAutoChat()
+        }
+    }
+
+    private fun sendNextMessage() {
+
+        if (messages.isEmpty()) {
+            return
+        }
+
+        if (currentIndex >= messages.size) {
+            currentIndex = 0
+        }
+
+        val message =
+            messages[currentIndex]
+
+        chatBox.append(
+            "You: $message\n\n"
+        )
+
+        currentIndex++
+    }
+
+    private fun stopAutoChat() {
+
+        autoRunning = false
+
+        handler.removeCallbacks(
+            autoSendRunnable
+        )
+
+        Toast.makeText(
+            this,
+            "Auto Chat Stopped",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    private fun updateMessageList() {
+
+        if (messages.isEmpty()) {
+
+            messageList.text =
+                "Saved messages..."
+
+            return
+        }
+
+        val text =
+            StringBuilder()
+
+        messages.forEachIndexed { index, message ->
+
+            text.append(index + 1)
+            text.append(". ")
+            text.append(message)
+            text.append("\n")
+        }
+
+        messageList.text =
+            text.toString()
+    }
+
+    private fun saveMessages() {
+
+        val data =
+            messages.joinToString("|||")
+
+        getSharedPreferences(
+            "messages",
+            MODE_PRIVATE
+        )
+            .edit()
+            .putString(
+                "list",
+                data
+            )
+            .apply()
+    }
+
+    private fun loadMessages() {
+
+        val data =
+            getSharedPreferences(
+                "messages",
+                MODE_PRIVATE
+            )
+                .getString(
+                    "list",
+                    ""
+                ) ?: ""
+
+        if (data.isNotEmpty()) {
+
+            messages.clear()
+
+            messages.addAll(
+                data.split("|||")
+            )
+        }
+
+        updateMessageList()
+    }
+
+    override fun onDestroy() {
+
+        handler.removeCallbacks(
+            autoSendRunnable
+        )
+
+        super.onDestroy()
+    }
+}
