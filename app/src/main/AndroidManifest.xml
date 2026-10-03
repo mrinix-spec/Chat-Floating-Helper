@@ -1,29 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
 
-    <application
-        android:allowBackup="true"
-        android:label="Chat Floating Helper"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Telegram Bot Manager"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="12dp"/>
 
-        <activity
-            android:name=".MainActivity"
-            android:exported="true">
+    <EditText
+        android:id="@+id/chatIdInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Telegram Chat ID"
+        android:inputType="number"/>
 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+    <EditText
+        android:id="@+id/messageInput"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:hint="Message likho"
+        android:gravity="top"
+        android:inputType="textMultiLine"/>
 
-        </activity>
+    <Button
+        android:id="@+id/addMessageButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ADD MESSAGE"/>
 
-        <service
-            android:name=".FloatingService"
-            android:exported="false" />
+    <TextView
+        android:id="@+id/messageList"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:padding="8dp"
+        android:text="Saved messages..."/>
 
-    </application>
+    <Button
+        android:id="@+id/sendTestButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SEND TELEGRAM TEST"/>
 
-</manifest>
+    <Button
+        android:id="@+id/startButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="START AUTO BOT"/>
+
+    <Button
+        android:id="@+id/stopButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="STOP AUTO BOT"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/chatBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:textSize="16sp"/>
+    </ScrollView>
+
+</LinearLayout>
