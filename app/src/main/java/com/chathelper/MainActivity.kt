@@ -1,147 +1,66 @@
-package com.chathelper
+<?xml version="1.0" encoding="utf-8"?>
 
-import android.content.Intent
-import android.net.Uri
-import android.os.Bundle
-import android.provider.Settings
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
 
-class MainActivity : AppCompatActivity() {
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="My Test Chat"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="12dp"/>
 
-    private val messages = ArrayList<String>()
+    <EditText
+        android:id="@+id/messageInput"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:hint="Custom message likho"
+        android:gravity="top"
+        android:inputType="textMultiLine"/>
 
-    private lateinit var messageInput: EditText
-    private lateinit var messageList: TextView
+    <Button
+        android:id="@+id/addMessageButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ADD MESSAGE"/>
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    <TextView
+        android:id="@+id/messageList"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:padding="8dp"
+        android:text="Saved messages..."
+        android:textSize="16sp"/>
 
-        setContentView(R.layout.activity_main)
+    <Button
+        android:id="@+id/startButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="START AUTO CHAT"/>
 
-        messageInput = findViewById(R.id.messageInput)
-        messageList = findViewById(R.id.messageList)
+    <Button
+        android:id="@+id/stopButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="STOP AUTO CHAT"/>
 
-        val addButton = findViewById<Button>(R.id.addMessageButton)
-        val startButton = findViewById<Button>(R.id.startButton)
-        val stopButton = findViewById<Button>(R.id.stopButton)
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-        addButton.setOnClickListener {
+        <TextView
+            android:id="@+id/chatBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:textSize="17sp"/>
+    </ScrollView>
 
-            val message = messageInput.text.toString().trim()
-
-            if (message.isNotEmpty()) {
-
-                messages.add(message)
-
-                messageInput.text.clear()
-
-                updateMessageList()
-
-                saveMessages()
-
-                Toast.makeText(
-                    this,
-                    "Message added",
-                    Toast.LENGTH_SHORT
-                ).show()
-
-            } else {
-
-                Toast.makeText(
-                    this,
-                    "Pehle message likho",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-
-        startButton.setOnClickListener {
-
-            saveMessages()
-
-            if (!Settings.canDrawOverlays(this)) {
-
-                val intent = Intent(
-                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:$packageName")
-                )
-
-                startActivity(intent)
-
-            } else {
-
-                startService(
-                    Intent(this, FloatingService::class.java)
-                )
-            }
-        }
-
-        stopButton.setOnClickListener {
-
-            stopService(
-                Intent(this, FloatingService::class.java)
-            )
-        }
-
-        loadMessages()
-    }
-
-    private fun updateMessageList() {
-
-        if (messages.isEmpty()) {
-
-            messageList.text = "Messages yahan dikhenge"
-
-            return
-        }
-
-        val text = StringBuilder()
-
-        messages.forEachIndexed { index, message ->
-
-            text.append(index + 1)
-            text.append(". ")
-            text.append(message)
-            text.append("\n\n")
-        }
-
-        messageList.text = text.toString()
-    }
-
-    private fun saveMessages() {
-
-        val data = messages.joinToString("|||")
-
-        getSharedPreferences(
-            "messages",
-            MODE_PRIVATE
-        )
-            .edit()
-            .putString("list", data)
-            .apply()
-    }
-
-    private fun loadMessages() {
-
-        val data = getSharedPreferences(
-            "messages",
-            MODE_PRIVATE
-        )
-            .getString("list", "") ?: ""
-
-        if (data.isNotEmpty()) {
-
-            messages.clear()
-
-            messages.addAll(
-                data.split("|||")
-            )
-        }
-
-        updateMessageList()
-    }
-}
+</LinearLayout>
