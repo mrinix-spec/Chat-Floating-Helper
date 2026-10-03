@@ -13,43 +13,31 @@ class MainActivity : AppCompatActivity() {
 
     private val messages = ArrayList<String>()
 
+    private lateinit var chatIdInput: EditText
     private lateinit var messageInput: EditText
     private lateinit var messageList: TextView
-    private lateinit var chatBox: TextView
+    private lateinit var statusText: TextView
 
     private val handler = Handler(Looper.getMainLooper())
 
     private var currentIndex = 0
     private var autoRunning = false
 
-    private val autoSendRunnable = object : Runnable {
-
-        override fun run() {
-
-            if (!autoRunning || messages.isEmpty()) {
-                return
-            }
-
-            sendNextMessage()
-
-            handler.postDelayed(
-                this,
-                5000
-            )
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
 
+        chatIdInput = findViewById(R.id.chatIdInput)
         messageInput = findViewById(R.id.messageInput)
         messageList = findViewById(R.id.messageList)
-        chatBox = findViewById(R.id.chatBox)
+        statusText = findViewById(R.id.statusText)
 
-        val addButton =
+        val addMessageButton =
             findViewById<Button>(R.id.addMessageButton)
+
+        val sendTestButton =
+            findViewById<Button>(R.id.sendTestButton)
 
         val startButton =
             findViewById<Button>(R.id.startButton)
@@ -59,19 +47,17 @@ class MainActivity : AppCompatActivity() {
 
         loadMessages()
 
-        addButton.setOnClickListener {
+        addMessageButton.setOnClickListener {
 
             val message =
                 messageInput.text.toString().trim()
 
             if (message.isEmpty()) {
-
                 Toast.makeText(
                     this,
                     "Pehle message likho",
                     Toast.LENGTH_SHORT
                 ).show()
-
                 return@setOnClickListener
             }
 
@@ -89,88 +75,77 @@ class MainActivity : AppCompatActivity() {
             ).show()
         }
 
-        startButton.setOnClickListener {
+        sendTestButton.setOnClickListener {
 
-            if (messages.isEmpty()) {
+            val chatId =
+                chatIdInput.text.toString().trim()
 
+            if (chatId.isEmpty()) {
                 Toast.makeText(
                     this,
-                    "Pehle kam se kam 1 message add karo",
+                    "Telegram Chat ID enter karo",
                     Toast.LENGTH_SHORT
                 ).show()
-
                 return@setOnClickListener
             }
 
-            if (autoRunning) {
+            if (messages.isEmpty()) {
+                Toast.makeText(
+                    this,
+                    "Pehle message add karo",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+
+            statusText.text =
+                "Status: Telegram test ready\nChat ID: $chatId"
+        }
+
+        startButton.setOnClickListener {
+
+            if (messages.isEmpty()) {
+                Toast.makeText(
+                    this,
+                    "Pehle message add karo",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+
+            if (chatIdInput.text.toString().trim().isEmpty()) {
+                Toast.makeText(
+                    this,
+                    "Telegram Chat ID enter karo",
+                    Toast.LENGTH_SHORT
+                ).show()
                 return@setOnClickListener
             }
 
             autoRunning = true
             currentIndex = 0
 
-            Toast.makeText(
-                this,
-                "Auto Chat Started",
-                Toast.LENGTH_SHORT
-            ).show()
-
-            handler.post(autoSendRunnable)
+            statusText.text =
+                "Status: Auto Bot ON"
         }
 
         stopButton.setOnClickListener {
 
-            stopAutoChat()
+            autoRunning = false
+
+            statusText.text =
+                "Status: Stopped"
         }
-    }
-
-    private fun sendNextMessage() {
-
-        if (messages.isEmpty()) {
-            return
-        }
-
-        if (currentIndex >= messages.size) {
-            currentIndex = 0
-        }
-
-        val message =
-            messages[currentIndex]
-
-        chatBox.append(
-            "You: $message\n\n"
-        )
-
-        currentIndex++
-    }
-
-    private fun stopAutoChat() {
-
-        autoRunning = false
-
-        handler.removeCallbacks(
-            autoSendRunnable
-        )
-
-        Toast.makeText(
-            this,
-            "Auto Chat Stopped",
-            Toast.LENGTH_SHORT
-        ).show()
     }
 
     private fun updateMessageList() {
 
         if (messages.isEmpty()) {
-
-            messageList.text =
-                "Saved messages..."
-
+            messageList.text = "Saved messages..."
             return
         }
 
-        val text =
-            StringBuilder()
+        val text = StringBuilder()
 
         messages.forEachIndexed { index, message ->
 
@@ -180,8 +155,7 @@ class MainActivity : AppCompatActivity() {
             text.append("\n")
         }
 
-        messageList.text =
-            text.toString()
+        messageList.text = text.toString()
     }
 
     private fun saveMessages() {
@@ -194,10 +168,7 @@ class MainActivity : AppCompatActivity() {
             MODE_PRIVATE
         )
             .edit()
-            .putString(
-                "list",
-                data
-            )
+            .putString("list", data)
             .apply()
     }
 
@@ -208,10 +179,7 @@ class MainActivity : AppCompatActivity() {
                 "messages",
                 MODE_PRIVATE
             )
-                .getString(
-                    "list",
-                    ""
-                ) ?: ""
+                .getString("list", "") ?: ""
 
         if (data.isNotEmpty()) {
 
@@ -227,9 +195,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
 
-        handler.removeCallbacks(
-            autoSendRunnable
-        )
+        handler.removeCallbacksAndMessages(null)
 
         super.onDestroy()
     }
