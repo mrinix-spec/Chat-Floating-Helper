@@ -5,23 +5,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:padding="16dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Chat Floating Helper"
-        android:textSize="25sp"
+        android:text="My Test Chat"
+        android:textSize="24sp"
         android:textStyle="bold"
         android:gravity="center"
-        android:layout_marginBottom="20dp"/>
+        android:layout_marginBottom="12dp"/>
 
     <EditText
         android:id="@+id/messageInput"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="100dp"
+        android:hint="Custom message likho"
         android:gravity="top"
-        android:hint="Yahan custom message likho"
         android:inputType="textMultiLine"/>
 
     <Button
@@ -33,22 +33,34 @@
     <TextView
         android:id="@+id/messageList"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:text="Messages yahan dikhenge"
-        android:textSize="16sp"
-        android:padding="10dp"/>
+        android:layout_height="120dp"
+        android:padding="8dp"
+        android:text="Saved messages..."
+        android:textSize="16sp"/>
 
     <Button
         android:id="@+id/startButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="START FLOATING HELPER"/>
+        android:text="START AUTO CHAT"/>
 
     <Button
         android:id="@+id/stopButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="STOP FLOATING HELPER"/>
+        android:text="STOP AUTO CHAT"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/chatBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:textSize="17sp"/>
+    </ScrollView>
 
 </LinearLayout>
