@@ -21,11 +21,19 @@
             android:layout_marginBottom="16dp"/>
 
         <EditText
+            android:id="@+id/botTokenInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Bot Token"
+            android:inputType="textPassword"
+            android:layout_marginBottom="10dp"/>
+
+        <EditText
             android:id="@+id/chatIdInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Telegram Chat ID"
-            android:inputType="number"
+            android:inputType="text"
             android:layout_marginBottom="10dp"/>
 
         <EditText
